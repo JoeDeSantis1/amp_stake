@@ -138,7 +138,7 @@ const AmpCalculator = () => {
         <Grid container justifyContent='center'>
             <Card elevation={10} style={{padding: '10px', maxWidth: '800px'}}>
                 <Typography align='center' gutterBottom>
-                    {`If you were to stake ${formData.totalAmp} AMP right now, it will take ${howLong()} for your rewards to recoup the cost of staking`}
+                    {`If you were to stake ${formData.totalAmp} AMP right now, it will take about ${howLong()} for your rewards to recoup the cost of staking`}
                 </Typography>
                 <Typography align='center' gutterBottom>
                     {`Note: This is based on the current AMP price of $${currentAmpPrice}. The price per AMP is always changing which will affect how quickly the fees are recouped`}
