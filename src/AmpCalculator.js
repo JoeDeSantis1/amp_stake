@@ -6,6 +6,7 @@ import AmpCalcInput from './AmpCalcInput';
 import AmpCalcAutoFill from './AmpCalcAutoFill';
 import Footer from './Footer';
 import WarningDialogPopover from './WarningDialogPopover';
+import Loading from './Loading';
 
 const initialState = {
     totalAmp: '',
@@ -18,25 +19,46 @@ const AmpCalculator = () => {
     const [ethInUSD, setEthInUSD] = useState('');
     const [currentAmpPrice, setCurrentAmpPrice] = useState('');
     const [fadeIn, setFadeIn] = useState(false);
+    const [gasLoaded, setGasLoaded] = useState(false);
+    const [ethLoaded, setEthLoaded] = useState(false);
+    const [ampLoaded, setAmpLoaded] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
     const [warning, setWarning] = useState('');
 
 
     useEffect(() => {
-        fetch(`https://young-refuge-35360.herokuapp.com/ampStake/getGasFees`)
-        .then(res => res.json())
-        .then(data => setGwei(data.gwei))
-        .catch(error => console.log(error))
+        const fetchingData = async () => {
+            try {
+                fetch(`https://young-refuge-35360.herokuapp.com/ampStake/getGasFees`)
+                .then(res => res.json())
+                .then(data => {
+                    setGwei(data.gwei)
+                    setGasLoaded(true);
+                })
+                .catch(error => console.log(error))
 
-        fetch('https://young-refuge-35360.herokuapp.com/ampStake/getEthPrice')
-        .then(res => res.json())
-        .then(data => setEthInUSD(data.eth))
-        .catch(error => console.log(error))
+                fetch('https://young-refuge-35360.herokuapp.com/ampStake/getEthPrice')
+                .then(res => res.json())
+                .then(data => {
+                    setEthInUSD(data.eth)
+                    setEthLoaded(true);
+                })
+                .catch(error => console.log(error))
 
-        fetch('https://young-refuge-35360.herokuapp.com/ampStake/getAmpPrice')
-        .then(res => res.json())
-        .then(data => setCurrentAmpPrice(data.ampPrice))
-        .catch(error => console.log(error))
+                fetch('https://young-refuge-35360.herokuapp.com/ampStake/getAmpPrice')
+                .then(res => res.json())
+                .then(data => {
+                    setCurrentAmpPrice(data.ampPrice)
+                    setAmpLoaded(true);
+                })
+                .catch(error => console.log(error))
+
+            } catch(error) {
+                console.log(error)
+            }
+        }
+
+        fetchingData();
     }, [])
 
     const handleChange = ({target}) => {
@@ -157,12 +179,24 @@ const AmpCalculator = () => {
                     <Grid item>
                         <Card elevation={10}>
                         <Grid container spacing={2} direction='column' alignItems='center' raised style={{padding: '16px', minWidth: '250px', maxWidth: '645px', marginLeft: '0px', marginTop: '0px', width: '100%' }}>
-                            <Typography style={{margin: '10px', align: 'center'}}>Use this simple calculator to help determine how long it will take to recoup the cost of staking your AMP</Typography>
+                            <Typography align='center' style={{margin: '10px'}}>Use this simple calculator to help determine how long it will take to recoup the cost of staking your AMP</Typography>
                             <AmpCalcInput name='totalAmp' id='totalAmp' label='Amp Amount' autoFocus type='text' handleChange={handleChange} />
                             <AmpCalcInput name='apy' id='apy' label='Current APY (ex. 4.19, 4.19%, or 0.0419)' type='text' handleChange={handleChange} />
-                            <AmpCalcAutoFill name='ampPrice' id='ampPrice' label='Current AMP Price' type='text' value={currentAmpPrice} dollarSign handleChange={handleChange} />
-                            <AmpCalcAutoFill name='gwei' id='gwei' label='Current Gas fee' type='text' value={gwei} handleChange={handleChange} />
-                            <AmpCalcAutoFill name='ethInUSD' id='ethInUSD' label='Current Eth price (USD)' value={ethInUSD} dollarSign type='text' handleChange={handleChange} />
+                            { ampLoaded ?
+                                <AmpCalcAutoFill name='ampPrice' id='ampPrice' label='Current AMP Price' type='text' value={currentAmpPrice} dollarSign handleChange={handleChange} />
+                                :
+                                <Loading />
+                            }
+                            { gasLoaded ?
+                                <AmpCalcAutoFill name='gwei' id='gwei' label='Current Gas fee' type='text' value={gwei} handleChange={handleChange} />
+                                :
+                                <Loading />
+                            }
+                            { ethLoaded ?
+                                <AmpCalcAutoFill name='ethInUSD' id='ethInUSD' label='Current Eth price (USD)' value={ethInUSD} dollarSign type='text' handleChange={handleChange} />
+                                :
+                                <Loading />
+                            }
                             <Button variant='contained' onClick={handleButton} style={{marginTop: '15px'}}>Calculate How Long</Button>
                             <Typography style={{paddingTop: '10px'}}>AMP price data provided by {<a href='https://www.coingecko.com/en'>CoinGecko</a>}</Typography>
                         </Grid>
