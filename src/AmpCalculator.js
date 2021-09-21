@@ -11,6 +11,9 @@ import Loading from './Loading';
 const initialState = {
     totalAmp: '',
     apy: '',
+    gwei: '',
+    ethInUSD: '',
+    currentAmpPrice: '' 
 }
 
 const AmpCalculator = () => {
@@ -23,6 +26,7 @@ const AmpCalculator = () => {
     const [ethLoaded, setEthLoaded] = useState(false);
     const [ampLoaded, setAmpLoaded] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
+    const [showResult, setShowResult] = useState(true);
     const [warning, setWarning] = useState('');
 
 
@@ -62,15 +66,23 @@ const AmpCalculator = () => {
     }, [])
 
     const handleChange = ({target}) => {
-        console.log(target.value);
         if(target.value === '') {
-            setFadeIn(false);
+            setShowResult(false);
         }
+
         setFormData({...formData, [target.name]: target.value})
+
+        if(target.name === 'gwei') {
+            setGwei(target.value);
+        } else if (target.name === 'ethInUSD') {
+            setEthInUSD(target.value);
+        } else if (target.name === 'currentAmpPrice') {
+            setCurrentAmpPrice(target.value);
+        };
+
     }   
 
     const timeToRecoup = (days) => {
-        // console.log(days + ' days');
         if(days > 30 && days < 365) {
             const months = days / 30;
 
@@ -85,13 +97,9 @@ const AmpCalculator = () => {
             const years = days / 365;
 
             const monthsFraction = years % 1;
-            // console.log(monthsFraction + ' monthsFraction')
             const remainingMonths = monthsFraction * 365 / 30;
-            // console.log(remainingMonths + ' Remaining Months');
             const daysFraction = remainingMonths % 1;
-            // console.log(daysFraction + ' DaysFraction');
             const remainingDays = Math.floor(daysFraction * 30);
-            // console.log(remainingDays + ' remaining days');
 
             if(Math.floor(remainingMonths) === 0) {
                 const formattedTime = `${Math.floor(years)} year(s) ${remainingDays > 0 ? `and ${remainingDays} day(s)` : ''}`
@@ -142,17 +150,29 @@ const AmpCalculator = () => {
 
     const handleButton = () => {
         if(formData.totalAmp.length === 0 || formData.apy.length === 0) {
-            setWarning(`Both "Amp Amount" and "Current APY" are required fields`);
+            setWarning(`All fields are required`);
             setShowDialog(true);
-        } else if (isNaN(parseInt(formData.totalAmp)) || isNaN(parseInt(formData.apy))) {
+        } else if (function() {
+            for (const [key, value] of Object.entries(formData)) {
+                if (formData[key] === '') {
+                    return true
+                }
+
+                return false;
+            }
+        }) {
             setWarning(`Please only type in numbers`);
             setShowDialog(true);
         } else {
+            setShowResult(true);
             setFadeIn(true);
         }
+
+        //isNaN(parseInt(formData.totalAmp)) || isNaN(parseInt(formData.apy))
     }
 
     const closeDialog = () => {
+        setShowResult(true);
         setShowDialog(false);
     }
 
@@ -164,6 +184,16 @@ const AmpCalculator = () => {
                 </Typography>
                 <Typography align='center' gutterBottom>
                     {`Note: This is based on the current AMP price of $${currentAmpPrice}. The price per AMP is always changing which will affect how quickly the fees are recouped`}
+                </Typography>
+            </Card>
+        </Grid>
+    );
+
+    const notANumber = (
+        <Grid container justifyContent='center'>
+            <Card elevation={10} style={{padding: '10px', maxWidth: '800px'}}>
+                <Typography align='center' gutterBottom>
+                    Check your entered values, something's not right
                 </Typography>
             </Card>
         </Grid>
@@ -183,7 +213,7 @@ const AmpCalculator = () => {
                             <AmpCalcInput name='totalAmp' id='totalAmp' label='Amp Amount' autoFocus type='text' handleChange={handleChange} />
                             <AmpCalcInput name='apy' id='apy' label='Current APY (ex. 4.19, 4.19%, or 0.0419)' type='text' handleChange={handleChange} />
                             { ampLoaded ?
-                                <AmpCalcAutoFill name='ampPrice' id='ampPrice' label='Current AMP Price' type='text' value={currentAmpPrice} dollarSign handleChange={handleChange} />
+                                <AmpCalcAutoFill name='currentAmpPrice' id='currentAmpPrice' label='Current AMP Price' type='text' value={currentAmpPrice} dollarSign handleChange={handleChange} />
                                 :
                                 <Loading />
                             }
@@ -207,9 +237,15 @@ const AmpCalculator = () => {
                     </Grid>
                 </Grid>
             </div>
+            { showResult ? 
             <div style={{marginTop: '40px'}}>
                 <Fade in={fadeIn}>{result}</Fade>
             </div>
+            :
+            <div style={{marginTop: '40px'}}>
+                <Fade in={fadeIn}>{notANumber}</Fade>
+            </div>
+            }
             <div>
                 <Footer />
             </div>

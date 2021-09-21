@@ -20,10 +20,18 @@ const AmpCalcAutoFill = ({name, id, handleChange, label, value, autoFocus, dolla
                     onChange={handleChange}
                     variant='outlined'
                     fullWidth
-                    label={label}
+                    label={name === 'currentAmpPrice' ? `${label} (ex. 0.052)` : name === 'ethInUSD' ? `${label} (ex. 3432.14)` : `${label}`}
                     autoFocus={autoFocus}
                     type={type}
                     required
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                    InputProps={
+                        dollarSign && {
+                            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                        }
+                    }
                 />
             :
                 <TextField 
