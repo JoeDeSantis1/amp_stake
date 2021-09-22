@@ -38,6 +38,7 @@ const AmpCalculator = () => {
                 .then(data => {
                     setGwei(data.gwei)
                     setGasLoaded(true);
+                    setFormData({...formData, 'gwei': data.gwei})
                 })
                 .catch(error => console.log(error))
 
@@ -46,6 +47,7 @@ const AmpCalculator = () => {
                 .then(data => {
                     setEthInUSD(data.eth)
                     setEthLoaded(true);
+                    setFormData({...formData, 'ethInUSD': data.eth})
                 })
                 .catch(error => console.log(error))
 
@@ -54,6 +56,7 @@ const AmpCalculator = () => {
                 .then(data => {
                     setCurrentAmpPrice(data.ampPrice)
                     setAmpLoaded(true);
+                    setFormData({...formData, 'currentAmpPrice': data.ampPrice})
                 })
                 .catch(error => console.log(error))
 
@@ -66,10 +69,6 @@ const AmpCalculator = () => {
     }, [])
 
     const handleChange = ({target}) => {
-        if(target.value === '') {
-            setShowResult(false);
-        }
-
         setFormData({...formData, [target.name]: target.value})
 
         if(target.name === 'gwei') {
@@ -78,9 +77,18 @@ const AmpCalculator = () => {
             setEthInUSD(target.value);
         } else if (target.name === 'currentAmpPrice') {
             setCurrentAmpPrice(target.value);
-        };
+        }
 
-    }   
+        if(target.value === '') {
+            setShowResult(false);
+        } else if (parseFloat(target.value) === 0) {
+            setShowResult(false);
+        } else if (isNaN(parseFloat(target.value))) {
+            setShowResult(false);
+        } else {
+            setShowResult(true);
+        }
+    }
 
     const timeToRecoup = (days) => {
         if(days > 30 && days < 365) {
@@ -149,30 +157,22 @@ const AmpCalculator = () => {
     }
 
     const handleButton = () => {
-        if(formData.totalAmp.length === 0 || formData.apy.length === 0) {
+        if(formData.totalAmp.length === 0 || formData.apy.length === 0 || gwei.length === 0 || ethInUSD.length === 0 || currentAmpPrice.length === 0) {
             setWarning(`All fields are required`);
             setShowDialog(true);
-        } else if (function() {
-            for (const [key, value] of Object.entries(formData)) {
-                if (formData[key] === '') {
-                    return true
-                }
-
-                return false;
-            }
-        }) {
-            setWarning(`Please only type in numbers`);
+        } else if (parseFloat(formData.totalAmp) === 0 || parseFloat(formData.apy) === 0 || parseFloat(gwei) === 0 || parseFloat(ethInUSD) === 0 || parseFloat(currentAmpPrice) === 0) {
+            setWarning('None of the fields can equal 0')
+            setShowDialog(true);
+        } else if (isNaN(parseInt(formData.totalAmp)) || isNaN(parseInt(formData.apy)) || isNaN(parseInt(gwei)) || isNaN(parseInt(ethInUSD)) || isNaN(parseInt(currentAmpPrice))) {
+            setWarning(`Please only type numbers`);
             setShowDialog(true);
         } else {
             setShowResult(true);
             setFadeIn(true);
         }
-
-        //isNaN(parseInt(formData.totalAmp)) || isNaN(parseInt(formData.apy))
     }
 
     const closeDialog = () => {
-        setShowResult(true);
         setShowDialog(false);
     }
 
@@ -192,9 +192,22 @@ const AmpCalculator = () => {
     const notANumber = (
         <Grid container justifyContent='center'>
             <Card elevation={10} style={{padding: '10px', maxWidth: '800px'}}>
-                <Typography align='center' gutterBottom>
-                    Check your entered values, something's not right
+                <Typography>
+                    Check your entered values:
                 </Typography>
+                <Typography gutterBottom>
+                    <ul>
+                        <li>All fields are required</li>
+                        <li>None of the fields can equal 0</li>
+                        <li>Fields can only contain numbers</li>
+                    </ul>
+                </Typography>
+                {/* <Typography align='center' gutterBottom>
+                    None of the fields can equal 0
+                </Typography>
+                <Typography align='center'>
+                    Fields can only contain numbers
+                </Typography> */}
             </Card>
         </Grid>
     );
@@ -218,7 +231,7 @@ const AmpCalculator = () => {
                                 <Loading />
                             }
                             { gasLoaded ?
-                                <AmpCalcAutoFill name='gwei' id='gwei' label='Current Gas fee' type='text' value={gwei} handleChange={handleChange} />
+                                <AmpCalcAutoFill name='gwei' id='gwei' label='Current Gas fee (gwei)' type='text' value={gwei} handleChange={handleChange} />
                                 :
                                 <Loading />
                             }
@@ -227,7 +240,7 @@ const AmpCalculator = () => {
                                 :
                                 <Loading />
                             }
-                            <Button variant='contained' onClick={handleButton} style={{marginTop: '15px'}}>Calculate How Long</Button>
+                            <Button variant='contained' onClick={handleButton} style={{marginTop: '15px', backgroundColor: '#4B3F72'}}>Calculate How Long</Button>
                             <Typography style={{paddingTop: '10px'}}>AMP price data provided by {<a href='https://www.coingecko.com/en'>CoinGecko</a>}</Typography>
                         </Grid>
                         </Card>

@@ -22,6 +22,7 @@ const AmpCalcAutoFill = ({name, id, handleChange, label, value, autoFocus, dolla
                     fullWidth
                     label={name === 'currentAmpPrice' ? `${label} (ex. 0.052)` : name === 'ethInUSD' ? `${label} (ex. 3432.14)` : `${label}`}
                     autoFocus={autoFocus}
+                    defaultValue={value}
                     type={type}
                     required
                     InputLabelProps={{
@@ -40,7 +41,7 @@ const AmpCalcAutoFill = ({name, id, handleChange, label, value, autoFocus, dolla
                     onChange={handleChange}
                     variant='filled'
                     fullWidth
-                    value={dollarSign ? value : `${value} gwei`}
+                    value={value}
                     label={label}
                     autoFocus={autoFocus}
                     type={type}
