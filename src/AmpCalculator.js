@@ -241,7 +241,8 @@ const AmpCalculator = () => {
                                 <Loading />
                             }
                             <Button variant='contained' onClick={handleButton} style={{marginTop: '15px', backgroundColor: '#4B3F72'}}>Calculate How Long</Button>
-                            <Typography style={{paddingTop: '10px'}}>AMP price data provided by {<a href='https://www.coingecko.com/en'>CoinGecko</a>}</Typography>
+                            <Typography align='center' style={{paddingTop: '10px'}}>AMP price data provided by {<a href='https://www.coingecko.com/en'>CoinGecko</a>}</Typography>
+                            <Typography align='center' style={{paddingTop: '1px'}}>Disclaimer: This is for calculating the cost of staking to app.flexa.network only</Typography>
                         </Grid>
                         </Card>
                     </Grid>
