@@ -195,7 +195,7 @@ const AmpCalculator = () => {
                 <Typography>
                     Check your entered values:
                 </Typography>
-                <Typography gutterBottom>
+                <Typography gutterBottom style={{paddingRight: '10px'}}>
                     <ul>
                         <li>All fields are required</li>
                         <li>None of the fields can equal 0</li>
