@@ -1,3 +1,3 @@
 Thanks for checking out my App!
 
-The AMP staking Calculator helps to determine how long it will take to recoup the cost of staking your AMP.
+AMP is a digital collateral token used to facilitate digital transfers of currency. AMP tokens can be purchased and offered to a collateral pool for use by the network running the pool. The process of offering your AMP tokens for use is called staking. The owner of the AMP is rewarded for offering their tokens as collateral. There is, however, a cost associated with staking. This cost changes frequently and the AMP staking calculator helps determine how long it takes to recoup the cost.
